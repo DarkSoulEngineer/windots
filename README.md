@@ -31,7 +31,6 @@ into a single repo with ready-to-use configs, themes, and a one-line installer.
 - **Neon-themed status bar** with cava audio visualizer, weather, battery, disk, and volume widgets
 - **Automatic colorscheme generation** from any wallpaper image
 - **Multi-monitor support** with per-monitor workspace binding
-- **Multi-monitor support** with per-monitor workspace binding
 - **One-line installer** that sets up everything
 
 ---
