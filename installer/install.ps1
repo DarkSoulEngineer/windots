@@ -1,9 +1,9 @@
 # ===============================================
 # install.ps1
-# Walzr (windots) unified installer
-# Installs Chocolatey + Git + Rust (MSVC only),
+# windots unified installer
+# Installs Chocolatey + Git + Rust (MSVC toolchain),
 # Visual Studio Build Tools, GlazeWM, Zebar,
-# and applies all themes from the windots repo.
+# and applies all configs from the windots repo.
 # ===============================================
 
 # ------------------------------
@@ -19,6 +19,13 @@ If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # ------------------------------
 Set-ExecutionPolicy Bypass -Scope Process -Force
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+# ------------------------------
+# Config
+# ------------------------------
+$WINDOTS_REPO = "https://github.com/DarkSoulEngineer/windots.git"
+$WINDOTS_DIR = Join-Path $env:USERPROFILE "windots"
+$GLZR_DIR = Join-Path $env:USERPROFILE ".glzr"
 
 # ------------------------------
 # Install Chocolatey if missing
@@ -121,7 +128,7 @@ if (-not (Test-Path $glazeExe)) {
     } else {
         Write-Warning "MSI install failed. Attempting source build..."
         Remove-Item $glazeMsi -Force
-        $glazeSrcDir = Join-Path $env:USERPROFILE ".glzr\glazewm"
+        $glazeSrcDir = Join-Path $env:USERPROFILE ".glzr\glazewm-src"
         if (-not (Test-Path (Join-Path $glazeSrcDir ".git"))) {
             git clone https://github.com/glzr-io/glazewm.git $glazeSrcDir
         }
@@ -174,29 +181,70 @@ if (-not ($env:Path -split ";" | Where-Object { $_ -eq $zebarInstallDir })) {
     }
 }
 
-# ===============================
-# Clone windots repo and apply themes
-# ===============================
-$userProfile = $env:USERPROFILE
-$windotsDir = Join-Path $env:TEMP "windots"
-$windotsRepoUrl = "https://github.com/DarkSoulEngineer/windots.git"
-
-if (-not (Test-Path (Join-Path $windotsDir ".git"))) {
-    Write-Host "Cloning windots repo..."
-    git clone $windotsRepoUrl $windotsDir
+# ==================================================
+# Clone windots repo
+# ==================================================
+if (-not (Test-Path (Join-Path $WINDOTS_DIR ".git"))) {
+    Write-Host "Cloning windots repo to $WINDOTS_DIR..."
+    git clone $WINDOTS_REPO $WINDOTS_DIR
 } else {
-    Write-Host "windots repo already cloned. Pulling latest..."
-    Push-Location $windotsDir
+    Write-Host "windots repo already exists. Pulling latest..."
+    Push-Location $WINDOTS_DIR
     git pull
     Pop-Location
 }
 
-# ================== Zebar Theme Setup ==================
-$zebarDir = Join-Path $userProfile ".glzr\zebar"
+# ==================================================
+# Helper: Replace placeholder in a file
+# ==================================================
+function Update-FilePlaceholder {
+    param([string]$FilePath, [string]$Placeholder, [string]$Replacement)
+    if (Test-Path $FilePath) {
+        $content = Get-Content $FilePath -Raw
+        $content = $content.Replace($Placeholder, $Replacement)
+        Set-Content -Path $FilePath -Value $content -NoNewline
+    }
+}
+
+# ==================================================
+# GlazeWM Setup
+# ==================================================
+$glazewmDir = Join-Path $GLZR_DIR "glazewm"
+New-Item -ItemType Directory -Force -Path $glazewmDir | Out-Null
+
+# Copy main config
+Copy-Item (Join-Path $WINDOTS_DIR "themes\glazewm\config.yaml") (Join-Path $glazewmDir "config.yaml") -Force
+Write-Host "GlazeWM config.yaml installed to $glazewmDir"
+
+# Copy profiles
+$profilesSrc = Join-Path $WINDOTS_DIR "themes\glazewm\profiles"
+$profilesDest = Join-Path $glazewmDir "profiles"
+if (Test-Path $profilesSrc) {
+    New-Item -ItemType Directory -Force -Path $profilesDest | Out-Null
+    Copy-Item "$profilesSrc\*" $profilesDest -Recurse -Force
+    Write-Host "GlazeWM profiles installed to $profilesDest"
+}
+
+# Replace __VSCODE_PATH__ placeholder with actual VS Code path
+$vsCodePath = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd" -replace '\\', '/'
+$configPath = Join-Path $glazewmDir "config.yaml"
+$defaultProfile = Join-Path $profilesDest "default.yaml"
+$workProfile = Join-Path $profilesDest "work.yaml"
+
+Update-FilePlaceholder -FilePath $configPath -Placeholder "__VSCODE_PATH__" -Replacement $vsCodePath
+Update-FilePlaceholder -FilePath $defaultProfile -Placeholder "__VSCODE_PATH__" -Replacement $vsCodePath
+Update-FilePlaceholder -FilePath $workProfile -Placeholder "__VSCODE_PATH__" -Replacement $vsCodePath
+
+Write-Host "GlazeWM configs installed to $glazewmDir"
+
+# ==================================================
+# Zebar Setup
+# ==================================================
+$zebarDir = Join-Path $GLZR_DIR "zebar"
 New-Item -ItemType Directory -Force -Path $zebarDir | Out-Null
 
 # Copy zebar theme
-$zebarThemeSrc = Join-Path $windotsDir "themes\zebar\zebar_neon_theme"
+$zebarThemeSrc = Join-Path $WINDOTS_DIR "themes\zebar\zebar_neon_theme"
 $zebarThemeDest = Join-Path $zebarDir "zebar_neon_theme"
 if (Test-Path $zebarThemeSrc) {
     Copy-Item -Path $zebarThemeSrc -Destination $zebarThemeDest -Recurse -Force
@@ -204,41 +252,40 @@ if (Test-Path $zebarThemeSrc) {
 }
 
 # Copy settings.json
-$zebarSettingsSrc = Join-Path $windotsDir "themes\zebar\settings.json"
-$zebarSettingsDest = Join-Path $zebarDir "settings.json"
+$zebarSettingsSrc = Join-Path $WINDOTS_DIR "themes\zebar\settings.json"
 if (Test-Path $zebarSettingsSrc) {
-    Copy-Item -Path $zebarSettingsSrc -Destination $zebarSettingsDest -Force
+    Copy-Item -Path $zebarSettingsSrc -Destination (Join-Path $zebarDir "settings.json") -Force
     Write-Host "Zebar settings.json installed to $zebarDir"
 }
 
-# ================== GlazeWM Theme Setup ==================
-$glazewmDir = Join-Path $userProfile ".glzr\glazewm"
-New-Item -ItemType Directory -Force -Path $glazewmDir | Out-Null
-
-$glazewmConfigSrc = Join-Path $windotsDir "themes\glazewm\config.yaml"
-$glazewmConfigDest = Join-Path $glazewmDir "config.yaml"
-if (Test-Path $glazewmConfigSrc) {
-    Copy-Item -Path $glazewmConfigSrc -Destination $glazewmConfigDest -Force
-    Write-Host "GlazeWM config.yaml installed to $glazewmDir"
+# Copy cava-feeder script
+$cavaSrc = Join-Path $WINDOTS_DIR "themes\zebar\cava-feeder.ps1"
+if (Test-Path $cavaSrc) {
+    Copy-Item -Path $cavaSrc -Destination (Join-Path $zebarDir "cava-feeder.ps1") -Force
+    Write-Host "Cava feeder script installed to $zebarDir"
 }
 
-# ================== Build and install Walzr ==================
+# ==================================================
+# Build and install Walzr
+# ==================================================
 Write-Host "Building Walzr from source..."
-Push-Location $windotsDir
+Push-Location $WINDOTS_DIR
 cargo build --release
 if ($LASTEXITCODE -eq 0) {
-    $walzrBin = Join-Path $windotsDir "target\release\wallust.exe"
+    $walzrBin = Join-Path $WINDOTS_DIR "target\release\wallust.exe"
     $walzrDest = Join-Path $cargoBin "wallust.exe"
     if (Test-Path $walzrBin) {
         Copy-Item $walzrBin $walzrDest -Force
         Write-Host "Walzr installed to $walzrDest"
     }
 } else {
-    Write-Warning "Walzr build failed. You can build it manually later with: cargo build --release"
+    Write-Warning "Walzr build failed. Build manually with: cargo build --release"
 }
 Pop-Location
 
-# ================== Launch GlazeWM ==================
+# ==================================================
+# Launch GlazeWM
+# ==================================================
 if (Test-Path $glazeExe) {
     Write-Host "`nLaunching GlazeWM (it will auto-launch Zebar)..."
     Start-Process -FilePath $glazeExe -WorkingDirectory $glazeInstallDir
@@ -246,5 +293,14 @@ if (Test-Path $glazeExe) {
     Write-Warning "GlazeWM.exe not found."
 }
 
-Write-Host "`nInstallation process complete! GlazeWM, Zebar, and Walzr are ready."
-Write-Host "Repo cloned to: $windotsDir"
+Write-Host "`n=========================================="
+Write-Host " windots installation complete!"
+Write-Host "=========================================="
+Write-Host " Repo: $WINDOTS_DIR"
+Write-Host " GlazeWM config: $glazewmDir"
+Write-Host " Zebar config: $zebarDir"
+Write-Host " Walzr binary: $cargoBin\wallust.exe"
+Write-Host ""
+Write-Host " Profile toggle: win+ctrl+p"
+Write-Host " Cava feeder: $zebarDir\cava-feeder.ps1"
+Write-Host "=========================================="

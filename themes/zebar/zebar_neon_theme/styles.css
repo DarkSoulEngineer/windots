@@ -1,65 +1,40 @@
-/**
- * Import the Nerdfonts icon font.
- * Ref https://www.nerdfonts.com/cheat-sheet for a cheatsheet of available Nerdfonts icons.
- */
-/*
- * Modified by
- * ___                 _     ___                _   ___                 _                          
- *|   \   __ _   _ _  | |__ / __|  ___   _  _  | | | __|  _ _    __ _  (_)  _ _    ___   ___   _ _ 
- *| |) | / _` | | '_| | / / \__ \ / _ \ | || | | | | _|  | ' \  / _` | | | | ' \  / -_) / -_) | '_|
- *|___/  \__,_| |_|   |_\_\ |___/ \___/  \_,_| |_| |___| |_||_| \__, | |_| |_||_| \___| \___| |_|  
- *                                                              |___/                               
- */
 @import 'https://www.nerdfonts.com/assets/css/webfont.css';
 
 :root {
-  /* +++++ DYNAMIC +++++ */
-  --color-primary: rgb(0 255 255 / 100%);
-  --color-primary-light: rgb(0 255 255 / 30%);
-  --color-primary-hover: rgb(0 255 255 / 70%);
-  --color-primary-glow: rgb(0 255 255 / 80%);
+  --color-primary: rgb(108 157 164 / 100%);
+  --color-primary-light: rgb(108 157 164 / 30%);
+  --color-primary-hover: rgb(71 29 18 / 70%);
+  --color-primary-glow: rgb(108 157 164 / 80%);
 
-  /* === BOX / PANEL COLORS === */
-  --color-primary-box: rgb(0 255 255 / 20%);
-  --color-primary-box-strong: rgb(0 255 255 / 40%);
-  --color-secondary: rgb(50 50 50 / 80%);
+  --color-primary-box: rgb(71 91 98 / 20%);
+  --color-primary-box-strong: rgb(71 91 98 / 40%);
+  --color-secondary: rgb(55 57 58 / 80%);
 
-  
-  /* === TEXT COLORS === */
-  --color-white: rgb(238 239 240 / 90%);
-  --color-white-strong: rgb(238 239 240 / 100%);
-  
-  /* +++++ STATIC +++++ */
-  --color-root-bg: rgb(30 30 30 / 0%);  /* solid dark background */
-  --transparent-backround: rgb(30 30 30 / 25%);
-  
-  /* === ALERT COLORS === */
-  --color-alert: rgb(174 51 5 / 100%);
-  --color-alert-glow: rgb(174 51 5 / 70%);
+  --color-white: rgb(229 217 220 / 90%);
+  --color-white-strong: rgb(229 217 220 / 100%);
 
-  /* === BATTERY COLORS === */
-  --color-battery-full: rgb(80 130 30 / 100%);
-  --color-battery-full-glow: rgb(80 130 30 / 80%);
+  --color-root-bg: rgb(30 30 30 / 0%);
+  --color-bg: rgb(30 30 30 / 25%);
+
+  --color-alert: rgb(8 17 22 / 100%);
+  --color-alert-glow: rgb(8 17 22 / 70%);
+
+  --color-battery-full: rgb(108 157 164 / 100%);
+  --color-battery-full-glow: rgb(108 157 164 / 80%);
   --color-battery-pulse: rgb(0 200 100 / 100%);
 }
 
-/* =========================
-  ICONS (NERDFONT)
-========================= */
 i {
   color: var(--color-primary);
   margin-right: 7px;
   text-shadow: 0 0 10px var(--color-primary-glow);
 }
 
-/* =========================
-  BODY AND GLOBAL STYLES
-========================= */
 body {
   color: var(--color-white-strong);
   font-family: ui-monospace, monospace;
   font-size: 12px;
-  overflow: hidden; /* hide scrollbars */
+  overflow: hidden;
   margin: 0;
   padding: 0;
 }
@@ -71,17 +46,13 @@ div, span, p {
 
 html, body, #root {
   height: 100%;
+  background: transparent;
 }
 
-/* Root container with background and subtle glow */
 #root {
   background-color: var(--color-root-bg);
-  box-shadow: 0 0 20px var(--color-primary-box);
 }
 
-/* =========================
-  MAIN APP LAYOUT
-========================= */
 .app {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -90,15 +61,18 @@ html, body, #root {
   padding: 4px 0.7vw;
 }
 
-/* Sections: left, center, right */
 .left, .center, .right {
   display: flex;
   align-items: center;
 }
 
+.left {
+  gap: 4px;
+}
+
 .center {
   justify-self: center;
-  background: var(--transparent-backround);
+  background: var(--color-bg);
   padding: 4px 12px;
   border-radius: 4px;
   box-shadow: 0 0 12px var(--color-primary-box);
@@ -129,11 +103,9 @@ html, body, #root {
 
 .right {
   justify-self: end;
+  gap: 8px;
 }
 
-/* =========================
-  ICONS AND BUTTONS SPACING
-========================= */
 .logo, .binding-mode, .tiling-direction,
 .paused-button, .network, .memory, .cpu,
 .battery, .weather, .audio, .disk {
@@ -141,16 +113,16 @@ html, body, #root {
 }
 
 /* =========================
-  WORKSPACES
-========================= */
+   WORKSPACES
+   ========================= */
 .workspaces {
   display: flex;
   align-items: center;
+  gap: 4px;
 }
 
 .workspace {
-  background: var(--transparent-backround);
-  margin-right: 4px;
+  background: var(--color-bg);
   padding: 4px 8px;
   color: var(--color-white);
   border: 1px solid var(--color-primary-box);
@@ -175,8 +147,8 @@ html, body, #root {
 }
 
 /* =========================
-            BUTTONS
-   ======================== */
+   BUTTONS
+   ========================= */
 .binding-mode,
 .tiling-direction,
 .paused-button {
@@ -206,8 +178,8 @@ html, body, #root {
 }
 
 /* =========================
-  CPU & BATTERY
-========================= */
+   CPU & BATTERY
+   ========================= */
 .cpu .high-usage {
   color: var(--color-primary);
   text-shadow: 0 0 10px var(--color-primary-glow);
@@ -239,12 +211,13 @@ html, body, #root {
 }
 
 /* =========================
-  STATUS BOXES (NETWORK, MEMORY, etc.)
-========================= */
+   STATUS BOX
+   ========================= */
 .status-box {
   display: flex;
   align-items: center;
-  background: var(--transparent-backround);
+  gap: 2px;
+  background: var(--color-bg);
   padding: 4px 12px;
   border-radius: 4px;
   box-shadow: 0 0 12px var(--color-primary-box);
@@ -282,15 +255,58 @@ html, body, #root {
   color: var(--color-primary);
 }
 
-/* Audio muted indicator */
 .audio .muted {
   color: var(--color-primary);
   text-shadow: 0 0 10px var(--color-primary-glow);
 }
 
 /* =========================
-  ANIMATIONS
-========================= */
+   CAVA AUDIO VISUALIZER
+   ========================= */
+.cava-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-bg);
+  padding: 4px 10px;
+  border-radius: 4px;
+  box-shadow: 0 0 12px var(--color-primary-box);
+  border: 1px solid var(--color-primary-box);
+  margin-right: 8px;
+}
+
+.cava-container.cava-error {
+  opacity: 0.4;
+}
+
+.cava-icon {
+  font-size: 11px;
+  margin-right: 0;
+}
+
+.cava-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 28px;
+}
+
+.cava-bar {
+  width: 3px;
+  min-height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(
+    to top,
+    var(--color-primary),
+    rgb(108 157 164 / 60%)
+  );
+  box-shadow: 0 0 4px var(--color-primary-glow);
+  transition: height 0.05s ease-out;
+}
+
+/* =========================
+   ANIMATIONS
+   ========================= */
 @keyframes pulse-charging {
   0%, 100% {
     color: var(--color-battery-full);

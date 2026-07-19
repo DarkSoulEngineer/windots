@@ -7,8 +7,8 @@ A unified Windows desktop environment powered by [GlazeWM](https://github.com/gl
 | Component | Description |
 |-----------|-------------|
 | **Walzr** | CLI tool that generates colorschemes from wallpapers and applies them to GlazeWM, Zebar, and Windows Terminal |
-| **GlazeWM Theme** | Tiling window manager config with vim-style keybindings, workspaces, and window rules |
-| **Zebar Neon Theme** | Vibrant neon-themed top bar widget |
+| **GlazeWM Theme** | Tiling window manager config with vim-style keybindings, profile system (default/work), multi-monitor workspaces |
+| **Zebar Neon Theme** | Vibrant neon-themed top bar with cava audio visualizer, weather, battery, disk usage, volume controls |
 | **Installer** | One-liner PowerShell installer that sets up everything |
 
 ## Quick Install
@@ -19,34 +19,57 @@ Open **PowerShell as Administrator** and run:
 iex (iwr "https://raw.githubusercontent.com/DarkSoulEngineer/windots/main/installer/install.ps1" -UseBasicParsing).Content
 ```
 
-## Manual Setup
+## What the Installer Does
 
-### Prerequisites
-- Windows 10/11
-- Git
-- Rust (MSVC toolchain)
+1. Installs prerequisites (Chocolatey, Git, Rust, VS Build Tools, Brave)
+2. Installs GlazeWM and Zebar via MSI
+3. Clones this repo to `~/windots`
+4. Copies configs to `~/.glzr/glazewm/` and `~/.glzr/zebar/`
+5. Replaces hardcoded paths with your actual install location
+6. Builds and installs Walzr to `~/.cargo/bin/`
+7. Launches GlazeWM
 
-### Install dependencies
-1. Install [GlazeWM](https://github.com/glzr-io/glazewm/releases) via MSI
-2. Install [Zebar](https://github.com/glzr-io/zebar/releases) via MSI
+## Project Structure
 
-### Apply themes
-```powershell
-# GlazeWM config
-Copy-Item themes\glazewm\config.yaml "$env:USERPROFILE\.glzr\glazewm\config.yaml"
-
-# Zebar theme
-Copy-Item themes\zebar\zebar_neon_theme "$env:USERPROFILE\.glzr\zebar\zebar_neon_theme" -Recurse
-Copy-Item themes\zebar\settings.json "$env:USERPROFILE\.glzr\zebar\settings.json"
+```
+windots/
+├── src/                        # Walzr (wallust fork) source code
+├── themes/
+│   ├── glazewm/
+│   │   ├── config.yaml         # Main GlazeWM config
+│   │   └── profiles/
+│   │       ├── default.yaml    # Default profile (8px gaps, 3 monitors)
+│   │       └── work.yaml       # Work profile (4px gaps, 2 monitors)
+│   └── zebar/
+│       ├── settings.json       # Zebar startup settings
+│       ├── cava-feeder.ps1     # Cava audio data feeder script
+│       └── zebar_neon_theme/   # Neon bar theme with cava visualizer
+├── installer/
+│   └── install.ps1             # One-liner installer
+├── Cargo.toml                  # Rust project config
+├── wallust.toml                # Walzr default config
+└── ...
 ```
 
-### Build Walzr
-```powershell
-cargo build --release
-Copy-Item target\release\wallust.exe "$env:USERPROFILE\.cargo\bin\"
-```
+## Keybindings
 
-## Usage
+| Binding | Action |
+|---------|--------|
+| `alt+h/j/k/l` | Navigate windows (vim) |
+| `alt+shift+h/j/k/l` | Move windows |
+| `alt+1-9,0` | Switch workspace |
+| `alt+shift+1-9,0` | Move window to workspace |
+| `alt+t` | Toggle tiling |
+| `alt+f` | Toggle fullscreen |
+| `alt+r` | Enter resize mode |
+| `alt+d` | Enter passthrough mode |
+| `alt+c` | Open terminal |
+| `alt+b` | Open browser |
+| `alt+e` | Open file explorer |
+| `alt+v` | Open VS Code |
+| `win+ctrl+p` | Toggle profile (default/work) |
+
+## Walzr Usage
 
 ```powershell
 # Generate colorscheme from wallpaper
@@ -54,24 +77,6 @@ wallust run my_wallpaper.png
 
 # Apply to GlazeWM + Zebar
 wallust run my_wallpaper.png --glazewm --zebar
-```
-
-## Project Structure
-
-```
-windots/
-├── src/                    # Walzr (wallust fork) source code
-├── themes/
-│   ├── glazewm/            # GlazeWM window manager config
-│   │   └── config.yaml
-│   └── zebar/              # Zebar bar theme
-│       ├── zebar_neon_theme/
-│       └── settings.json
-├── installer/
-│   └── install.ps1         # One-liner installer
-├── Cargo.toml
-├── wallust.toml
-└── ...
 ```
 
 ## License

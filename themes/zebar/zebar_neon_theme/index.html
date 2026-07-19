@@ -5,10 +5,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Custom styles. -->
   <link rel="stylesheet" type="text/css" href="./styles.css" />
 
-  <!-- Allows React to be run buildless via "text/babel" script below. -->
   <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
     integrity="sha256-aS0B0wnsaDByLfE16h4MDCP1fQFccysd1YWOcV+gbBo=" crossorigin="anonymous"></script>
 </head>
@@ -20,6 +18,8 @@
     import React, {
       useState,
       useEffect,
+      useRef,
+      useCallback,
     } from 'https://esm.sh/react@18?dev';
     import { createRoot } from 'https://esm.sh/react-dom@18/client?dev';
     import * as zebar from 'https://esm.sh/zebar@2';
@@ -32,19 +32,73 @@
       battery: { type: 'battery' },
       memory: { type: 'memory' },
       weather: { type: 'weather' },
-      disk: { type: "disk" }
+      disk: { type: 'disk' },
+      audio: { type: 'audio' },
     });
 
     createRoot(document.getElementById('root')).render(<App />);
 
     function App() {
       const [output, setOutput] = useState(providers.outputMap);
+      const [audioData, setAudioData] = useState(new Uint8Array(0));
+      const [audioError, setAudioError] = useState(false);
+      const audioContextRef = useRef(null);
+      const analyserRef = useRef(null);
+      const animFrameRef = useRef(null);
+      const streamRef = useRef(null);
 
       useEffect(() => {
         providers.onOutput(() => setOutput(providers.outputMap));
       }, []);
 
-      // Get icon to show for current network status.
+      const initAudio = useCallback(async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false,
+            }
+          });
+          streamRef.current = stream;
+
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          audioContextRef.current = ctx;
+
+          const source = ctx.createMediaStreamSource(stream);
+          const analyser = ctx.createAnalyser();
+          analyser.fftSize = 128;
+          analyser.smoothingTimeConstant = 0.75;
+          source.connect(analyser);
+          analyserRef.current = analyser;
+
+          const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+          const tick = () => {
+            analyser.getByteFrequencyData(dataArray);
+            setAudioData(new Uint8Array(dataArray));
+            animFrameRef.current = requestAnimationFrame(tick);
+          };
+          tick();
+        } catch (err) {
+          console.warn('Audio capture failed (enable Stereo Mix in Sound settings):', err);
+          setAudioError(true);
+        }
+      }, []);
+
+      useEffect(() => {
+        initAudio();
+        return () => {
+          if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+          if (streamRef.current) {
+            streamRef.current.getTracks().forEach(t => t.stop());
+          }
+          if (audioContextRef.current) {
+            audioContextRef.current.close();
+          }
+        };
+      }, [initAudio]);
+
       function getNetworkIcon(networkOutput) {
         switch (networkOutput.defaultInterface?.type) {
           case 'ethernet':
@@ -52,110 +106,105 @@
           case 'wifi':
             if (networkOutput.defaultGateway?.signalStrength >= 80) {
               return <i className="nf nf-md-wifi_strength_4"></i>;
-            } else if (
-              networkOutput.defaultGateway?.signalStrength >= 65
-            ) {
+            } else if (networkOutput.defaultGateway?.signalStrength >= 65) {
               return <i className="nf nf-md-wifi_strength_3"></i>;
-            } else if (
-              networkOutput.defaultGateway?.signalStrength >= 40
-            ) {
+            } else if (networkOutput.defaultGateway?.signalStrength >= 40) {
               return <i className="nf nf-md-wifi_strength_2"></i>;
-            } else if (
-              networkOutput.defaultGateway?.signalStrength >= 25
-            ) {
+            } else if (networkOutput.defaultGateway?.signalStrength >= 25) {
               return <i className="nf nf-md-wifi_strength_1"></i>;
             } else {
               return <i className="nf nf-md-wifi_strength_outline"></i>;
             }
           default:
-            return (
-              <i className="nf nf-md-wifi_strength_off_outline"></i>
-            );
+            return <i className="nf nf-md-wifi_strength_off_outline"></i>;
         }
       }
 
-      // Get icon to show for how much of the battery is charged.
       function getBatteryIcon(batteryOutput) {
         let batteryClass = '';
-        let batteryIcon;
-        
-        if (batteryOutput.chargePercent === 100) {
-          batteryClass = ' full-battery';
-        } else if (batteryOutput.chargePercent <= 20) {
-          batteryClass = ' low-battery';
-        }
-        
+        if (batteryOutput.chargePercent === 100) batteryClass = ' full-battery';
+        else if (batteryOutput.chargePercent <= 20) batteryClass = ' low-battery';
+
+        let icon;
         if (batteryOutput.chargePercent > 90)
-          batteryIcon = <i className={`nf nf-fa-battery_4${batteryClass}`}></i>;
+          icon = <i className={`nf nf-fa-battery_4${batteryClass}`}></i>;
         else if (batteryOutput.chargePercent > 70)
-          batteryIcon = <i className={`nf nf-fa-battery_3${batteryClass}`}></i>;
+          icon = <i className={`nf nf-fa-battery_3${batteryClass}`}></i>;
         else if (batteryOutput.chargePercent > 40)
-          batteryIcon = <i className={`nf nf-fa-battery_2${batteryClass}`}></i>;
+          icon = <i className={`nf nf-fa-battery_2${batteryClass}`}></i>;
         else if (batteryOutput.chargePercent > 20)
-          batteryIcon = <i className={`nf nf-fa-battery_1${batteryClass}`}></i>;
+          icon = <i className={`nf nf-fa-battery_1${batteryClass}`}></i>;
         else
-          batteryIcon = <i className={`nf nf-fa-battery_0${batteryClass}`}></i>;
-        
+          icon = <i className={`nf nf-fa-battery_0${batteryClass}`}></i>;
+
         if (batteryOutput.isCharging) {
           return (
             <>
               <i className="nf nf-md-power_plug charging"></i>
-              {batteryIcon}
+              {icon}
             </>
           );
         }
-        
-        return batteryIcon;
+        return icon;
       }
 
-      // Get icon to show for current weather status.
       function getWeatherIcon(weatherOutput) {
         switch (weatherOutput.status) {
-          case 'clear_day':
-            return <i className="nf nf-weather-day_sunny"></i>;
-          case 'clear_night':
-            return <i className="nf nf-weather-night_clear"></i>;
-          case 'cloudy_day':
-            return <i className="nf nf-weather-day_cloudy"></i>;
-          case 'cloudy_night':
-            return <i className="nf nf-weather-night_alt_cloudy"></i>;
-          case 'light_rain_day':
-            return <i className="nf nf-weather-day_sprinkle"></i>;
-          case 'light_rain_night':
-            return <i className="nf nf-weather-night_alt_sprinkle"></i>;
-          case 'heavy_rain_day':
-            return <i className="nf nf-weather-day_rain"></i>;
-          case 'heavy_rain_night':
-            return <i className="nf nf-weather-night_alt_rain"></i>;
-          case 'snow_day':
-            return <i className="nf nf-weather-day_snow"></i>;
-          case 'snow_night':
-            return <i className="nf nf-weather-night_alt_snow"></i>;
-          case 'thunder_day':
-            return <i className="nf nf-weather-day_lightning"></i>;
-          case 'thunder_night':
-            return <i className="nf nf-weather-night_alt_lightning"></i>;
+          case 'clear_day': return <i className="nf nf-weather-day_sunny"></i>;
+          case 'clear_night': return <i className="nf nf-weather-night_clear"></i>;
+          case 'cloudy_day': return <i className="nf nf-weather-day_cloudy"></i>;
+          case 'cloudy_night': return <i className="nf nf-weather-night_alt_cloudy"></i>;
+          case 'light_rain_day': return <i className="nf nf-weather-day_sprinkle"></i>;
+          case 'light_rain_night': return <i className="nf nf-weather-night_alt_sprinkle"></i>;
+          case 'heavy_rain_day': return <i className="nf nf-weather-day_rain"></i>;
+          case 'heavy_rain_night': return <i className="nf nf-weather-night_alt_rain"></i>;
+          case 'snow_day': return <i className="nf nf-weather-day_snow"></i>;
+          case 'snow_night': return <i className="nf nf-weather-night_alt_snow"></i>;
+          case 'thunder_day': return <i className="nf nf-weather-day_lightning"></i>;
+          case 'thunder_night': return <i className="nf nf-weather-night_alt_lightning"></i>;
         }
       }
 
-      function getAudioIcon(audioOutput) {
-        const volume = Math.round(audioOutput.defaultPlaybackDevice?.volume ?? 0);
-        if (volume === 0) {
-          return <i className="nf nf-fa-volume_off"></i>;
-        } else if (volume <= 33) {
-          return <i className="nf nf-fa-volume_down"></i>;
-        } else if (volume <= 66) {
-          return <i className="nf nf-md-volume_medium"></i>;
-        } else {
-          return <i className="nf nf-fa-volume_up"></i>;
-        }
+      function getVolumeIcon(audioOutput) {
+        const vol = Math.round(audioOutput.defaultPlaybackDevice?.volume ?? 0);
+        if (vol === 0) return <i className="nf nf-fa-volume_off"></i>;
+        if (vol <= 33) return <i className="nf nf-fa-volume_down"></i>;
+        if (vol <= 66) return <i className="nf nf-md-volume_medium"></i>;
+        return <i className="nf nf-fa-volume_up"></i>;
       }
 
       function getDiskUsagePercent(diskOutput) {
         if (!diskOutput?.disks?.length) return 0;
-        const totalSpace = diskOutput.disks.reduce((sum, disk) => sum + disk.totalSpace.bytes, 0);
-        const totalUsed = diskOutput.disks.reduce((sum, disk) => sum + (disk.totalSpace.bytes - disk.availableSpace.bytes), 0);
-        return totalSpace > 0 ? Math.round((totalUsed / totalSpace) * 100) : 0;
+        const total = diskOutput.disks.reduce((s, d) => s + d.totalSpace.bytes, 0);
+        const used = diskOutput.disks.reduce((s, d) => s + (d.totalSpace.bytes - d.availableSpace.bytes), 0);
+        return total > 0 ? Math.round((used / total) * 100) : 0;
+      }
+
+      function AudioVisualizer({ audioData, audioError }) {
+        const barCount = 24;
+        const bars = [];
+
+        for (let i = 0; i < barCount; i++) {
+          const dataIndex = Math.floor((i / barCount) * audioData.length);
+          const value = audioData[dataIndex] ?? 0;
+          const height = Math.max(2, (value / 255) * 28);
+          bars.push(
+            <div
+              key={i}
+              className="cava-bar"
+              style={{ height: `${height}px` }}
+            />
+          );
+        }
+
+        return (
+          <div className={`cava-container ${audioError ? 'cava-error' : ''}`}>
+            <i className="nf nf-fa-music cava-icon"></i>
+            <div className="cava-bars">
+              {bars}
+            </div>
+          </div>
+        );
       }
 
       return (
@@ -192,13 +241,15 @@
           </div>
 
           <div className="right">
+            <AudioVisualizer audioData={audioData} audioError={audioError} />
+
             <div className="status-box">
               {output.glazewm && (
                 <>
                   {output.glazewm.isPaused && (
                     <button
                       className="paused-button"
-                      onClick={() => glazewm.runCommand('wm-toggle-pause')}
+                      onClick={() => output.glazewm.runCommand('wm-toggle-pause')}
                     >
                       PAUSED
                     </button>
@@ -226,6 +277,13 @@
                 </>
               )}
 
+              {output.audio && (
+                <div className="audio">
+                  {getVolumeIcon(output.audio)}
+                  {Math.round(output.audio.defaultPlaybackDevice?.volume ?? 0)}%
+                </div>
+              )}
+
               {output.network && (
                 <div className="network">
                   {getNetworkIcon(output.network)}
@@ -243,9 +301,7 @@
               {output.cpu && (
                 <div className="cpu">
                   <i className="nf nf-oct-cpu"></i>
-                  <span
-                    className={output.cpu.usage > 85 ? 'high-usage' : ''}
-                  >
+                  <span className={output.cpu.usage > 85 ? 'high-usage' : ''}>
                     {Math.round(output.cpu.usage)}%
                   </span>
                 </div>
@@ -261,9 +317,7 @@
               {output.disk && (
                 <div className="disk">
                   <i className="nf nf-fa-hdd_o"></i>
-                  <span
-                    className={getDiskUsagePercent(output.disk) > 85 ? 'high-usage' : ''}
-                  >
+                  <span className={getDiskUsagePercent(output.disk) > 85 ? 'high-usage' : ''}>
                     {getDiskUsagePercent(output.disk)}%
                   </span>
                 </div>
