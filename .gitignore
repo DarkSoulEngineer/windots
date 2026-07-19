@@ -6,6 +6,7 @@ test.png
 *.jpeg
 *.gif
 !themes/**
+!assets/**
 book/
 # Nix
 result
