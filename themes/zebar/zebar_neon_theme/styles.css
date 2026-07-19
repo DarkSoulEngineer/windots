@@ -1,0 +1,303 @@
+/**
+ * Import the Nerdfonts icon font.
+ * Ref https://www.nerdfonts.com/cheat-sheet for a cheatsheet of available Nerdfonts icons.
+ */
+/*
+ * Modified by
+ * ___                 _     ___                _   ___                 _                          
+ *|   \   __ _   _ _  | |__ / __|  ___   _  _  | | | __|  _ _    __ _  (_)  _ _    ___   ___   _ _ 
+ *| |) | / _` | | '_| | / / \__ \ / _ \ | || | | | | _|  | ' \  / _` | | | | ' \  / -_) / -_) | '_|
+ *|___/  \__,_| |_|   |_\_\ |___/ \___/  \_,_| |_| |___| |_||_| \__, | |_| |_||_| \___| \___| |_|  
+ *                                                              |___/                               
+ */
+@import 'https://www.nerdfonts.com/assets/css/webfont.css';
+
+:root {
+  /* +++++ DYNAMIC +++++ */
+  --color-primary: rgb(0 255 255 / 100%);
+  --color-primary-light: rgb(0 255 255 / 30%);
+  --color-primary-hover: rgb(0 255 255 / 70%);
+  --color-primary-glow: rgb(0 255 255 / 80%);
+
+  /* === BOX / PANEL COLORS === */
+  --color-primary-box: rgb(0 255 255 / 20%);
+  --color-primary-box-strong: rgb(0 255 255 / 40%);
+  --color-secondary: rgb(50 50 50 / 80%);
+
+  
+  /* === TEXT COLORS === */
+  --color-white: rgb(238 239 240 / 90%);
+  --color-white-strong: rgb(238 239 240 / 100%);
+  
+  /* +++++ STATIC +++++ */
+  --color-root-bg: rgb(30 30 30 / 0%);  /* solid dark background */
+  --transparent-backround: rgb(30 30 30 / 25%);
+  
+  /* === ALERT COLORS === */
+  --color-alert: rgb(174 51 5 / 100%);
+  --color-alert-glow: rgb(174 51 5 / 70%);
+
+  /* === BATTERY COLORS === */
+  --color-battery-full: rgb(80 130 30 / 100%);
+  --color-battery-full-glow: rgb(80 130 30 / 80%);
+  --color-battery-pulse: rgb(0 200 100 / 100%);
+}
+
+/* =========================
+  ICONS (NERDFONT)
+========================= */
+i {
+  color: var(--color-primary);
+  margin-right: 7px;
+  text-shadow: 0 0 10px var(--color-primary-glow);
+}
+
+/* =========================
+  BODY AND GLOBAL STYLES
+========================= */
+body {
+  color: var(--color-white-strong);
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  overflow: hidden; /* hide scrollbars */
+  margin: 0;
+  padding: 0;
+}
+
+div, span, p {
+  cursor: default;
+  user-select: none;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+/* Root container with background and subtle glow */
+#root {
+  background-color: var(--color-root-bg);
+  box-shadow: 0 0 20px var(--color-primary-box);
+}
+
+/* =========================
+  MAIN APP LAYOUT
+========================= */
+.app {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  height: 100%;
+  padding: 4px 0.7vw;
+}
+
+/* Sections: left, center, right */
+.left, .center, .right {
+  display: flex;
+  align-items: center;
+}
+
+.center {
+  justify-self: center;
+  background: var(--transparent-backround);
+  padding: 4px 12px;
+  border-radius: 4px;
+  box-shadow: 0 0 12px var(--color-primary-box);
+  border: 1px solid var(--color-primary-box);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: var(--color-white);
+  text-shadow: 0 0 10px var(--color-primary-glow);
+}
+
+.center .date {
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+.center .separator {
+  margin: 0 8px;
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+.center .process {
+  font-weight: 400;
+  color: var(--color-primary);
+  text-transform: capitalize;
+  font-size: 0.95em;
+}
+
+.right {
+  justify-self: end;
+}
+
+/* =========================
+  ICONS AND BUTTONS SPACING
+========================= */
+.logo, .binding-mode, .tiling-direction,
+.paused-button, .network, .memory, .cpu,
+.battery, .weather, .audio, .disk {
+  margin-right: 12px;
+}
+
+/* =========================
+  WORKSPACES
+========================= */
+.workspaces {
+  display: flex;
+  align-items: center;
+}
+
+.workspace {
+  background: var(--transparent-backround);
+  margin-right: 4px;
+  padding: 4px 8px;
+  color: var(--color-white);
+  border: 1px solid var(--color-primary-box);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 12px var(--color-primary-box);
+}
+
+.workspace.displayed {
+  background: var(--color-secondary);
+  box-shadow: 0 0 12px var(--color-primary-box-strong);
+}
+
+.workspace.focused,
+.workspace:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  text-shadow: 0 0 10px var(--color-primary-glow);
+  box-shadow: 0 0 20px var(--color-primary-box);
+  border: 1px solid var(--color-primary-box);
+}
+
+/* =========================
+            BUTTONS
+   ======================== */
+.binding-mode,
+.tiling-direction,
+.paused-button {
+  background: var(--color-secondary);
+  color: var(--color-white);
+  border-radius: 4px;
+  line-height: 1;
+  padding: 4px 8px;
+  border: 1px solid var(--color-primary-box);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 10px var(--color-primary-box);
+}
+
+.binding-mode:hover,
+.tiling-direction:hover,
+.paused-button:hover {
+  background: var(--color-primary-box);
+  transform: translateY(-1px);
+  text-shadow: 0 0 10px var(--color-primary-glow);
+  box-shadow: 0 0 20px var(--color-primary-box-strong);
+  border: 1px solid var(--color-primary-box);
+}
+
+.binding-mode {
+  margin-right: 4px;
+}
+
+/* =========================
+  CPU & BATTERY
+========================= */
+.cpu .high-usage {
+  color: var(--color-primary);
+  text-shadow: 0 0 10px var(--color-primary-glow);
+}
+
+.battery {
+  position: relative;
+}
+
+.low-battery {
+  color: var(--color-alert);
+  text-shadow: 0 0 10px var(--color-alert-glow);
+}
+
+.full-battery {
+  color: var(--color-primary);
+  text-shadow: 0 0 10px var(--color-primary-glow);
+}
+
+.charging {
+  animation: pulse-charging 2s ease-in-out infinite;
+}
+
+.nf-md-power_plug.charging {
+  font-size: 0.6em;
+  margin-right: 2px;
+  position: relative;
+  top: -1px;
+}
+
+/* =========================
+  STATUS BOXES (NETWORK, MEMORY, etc.)
+========================= */
+.status-box {
+  display: flex;
+  align-items: center;
+  background: var(--transparent-backround);
+  padding: 4px 12px;
+  border-radius: 4px;
+  box-shadow: 0 0 12px var(--color-primary-box);
+  border: 1px solid var(--color-primary-box);
+}
+
+.network, .memory, .cpu, .battery, .weather, .audio, .disk {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--color-white-strong);
+}
+
+.network:hover, .memory:hover, .cpu:hover, .battery:hover, .weather:hover, .audio:hover, .disk:hover {
+  background: transparent;
+}
+
+.network {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.network .traffic {
+  display: flex;
+  gap: 4px;
+  font-size: 0.85em;
+  margin-left: 4px;
+  text-shadow: 0 0 10px var(--color-primary-glow);
+}
+
+.network .download,
+.network .upload {
+  color: var(--color-primary);
+}
+
+/* Audio muted indicator */
+.audio .muted {
+  color: var(--color-primary);
+  text-shadow: 0 0 10px var(--color-primary-glow);
+}
+
+/* =========================
+  ANIMATIONS
+========================= */
+@keyframes pulse-charging {
+  0%, 100% {
+    color: var(--color-battery-full);
+    text-shadow: 0 0 10px var(--color-battery-full-glow);
+  }
+  50% {
+    color: var(--color-battery-pulse);
+    text-shadow: 0 0 12px var(--color-battery-full-glow);
+  }
+}
