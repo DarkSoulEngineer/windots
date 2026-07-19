@@ -121,15 +121,21 @@ iex (iwr "https://raw.githubusercontent.com/DarkSoulEngineer/windots/main/instal
 
 ## Walzr
 
-Walzr is a Rust CLI tool (fork of [wallust](https://codeberg.org/explosion-mental/wallust)) that generates 16-color schemes from wallpaper images and applies them to GlazeWM, Zebar, and Windows Terminal.
+Walzr is a Rust CLI tool (fork of [wallust](https://codeberg.org/explosion-mental/wallust)) that extracts dominant colors from any wallpaper image and generates a full 16-color scheme. It can apply these colors directly to your desktop environment:
+
+- **GlazeWM** - Updates window border accent colors to match your wallpaper
+- **Zebar** - Injects accent colors into the bar theme CSS variables
+- **Windows Terminal** - Adds a matching color scheme to your terminal profiles
 
 ```powershell
 # Generate colorscheme from wallpaper
 wallust run my_wallpaper.png
 
-# Apply colors to GlazeWM + Zebar
+# Apply colors to GlazeWM borders + Zebar theme + Windows Terminal
 wallust run my_wallpaper.png --glazewm --zebar
 ```
+
+This means your entire desktop adapts its color palette to whatever wallpaper you set -- window borders, status bar accents, and terminal colors all stay in sync automatically.
 
 ---
 
