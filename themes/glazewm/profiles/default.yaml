@@ -1,7 +1,6 @@
 general:
-  startup_commands:
-    - 'shell-exec zebar'
-  shutdown_commands: ['shell-exec taskkill /IM zebar.exe /F']
+  startup_commands: []
+  shutdown_commands: []
   config_reload_commands: []
 
   focus_follows_cursor: true
@@ -18,7 +17,7 @@ gaps:
   scale_with_dpi: true
   inner_gap: '8px'
   outer_gap:
-    top: '48px'   #Zebar
+    top: '8px'   # yasb reserves bar space via OS work area; no bar on other monitors
     right: '8px'
     bottom: '8px'
     left: '8px'
@@ -87,7 +86,6 @@ workspaces:
 window_rules:
   - commands: ['ignore']
     match:
-      - window_process: {equals: 'zebar'}
       - window_title: {regex: '[Pp]icture.in.[Pp]icture'}
         window_class: {regex: 'Chrome_WidgetWin_1|MozillaDialogClass'}
       - window_process: {equals: 'PowerToys'}

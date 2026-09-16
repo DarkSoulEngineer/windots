@@ -12,11 +12,10 @@ iex (iwr "https://raw.githubusercontent.com/DarkSoulEngineer/windots/main/instal
 
 ## What it installs
 
-- Chocolatey, Git, Rust (MSVC), VS Build Tools, Brave
+- Chocolatey, Git, Brave
 - GlazeWM tiling window manager
-- Zebar status bar
-- windots configs (GlazeWM + Zebar themes)
-- Walzr color scheme generator
+- yasb status bar
+- windots configs (GlazeWM themes)
 
 ## Manual Install
 
