@@ -140,15 +140,17 @@ if (Test-Path $profilesSrc) {
     Write-Host "GlazeWM profiles installed to $profilesDest"
 }
 
+# Copy helper scripts used by shell-exec keybindings
+Copy-Item (Join-Path $WINDOTS_DIR "themes\glazewm\*.ps1") $glazewmDir -Force
+Write-Host "GlazeWM helper scripts installed to $glazewmDir"
+
 # Replace __VSCODE_PATH__ placeholder with actual VS Code path
 $vsCodePath = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd" -replace '\\', '/'
 $configPath = Join-Path $glazewmDir "config.yaml"
 $defaultProfile = Join-Path $profilesDest "default.yaml"
-$workProfile = Join-Path $profilesDest "work.yaml"
 
 Update-FilePlaceholder -FilePath $configPath -Placeholder "__VSCODE_PATH__" -Replacement $vsCodePath
 Update-FilePlaceholder -FilePath $defaultProfile -Placeholder "__VSCODE_PATH__" -Replacement $vsCodePath
-Update-FilePlaceholder -FilePath $workProfile -Placeholder "__VSCODE_PATH__" -Replacement $vsCodePath
 
 Write-Host "GlazeWM configs installed to $glazewmDir"
 

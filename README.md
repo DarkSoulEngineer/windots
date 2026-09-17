@@ -124,9 +124,10 @@ windots/
 ├── themes/
 │   └── glazewm/
 │       ├── config.yaml           # Main GlazeWM config
+│       ├── open-browser.ps1      # Opens the default browser
+│       ├── copy-url.ps1          # Copies the focused browser's URL
 │       └── profiles/
-│           ├── default.yaml      # Default: 8px gaps, 3 monitors
-│           └── work.yaml         # Work: 4px gaps, 2 monitors
+│           └── default.yaml      # Default: 8px gaps, 3 monitors
 ├── assets/screenshots/           # Desktop screenshots
 ├── installer/
 │   ├── install.ps1               # One-line installer
@@ -144,10 +145,7 @@ windots/
 Config is installed to `~/.glzr/glazewm/config.yaml`. Edit it directly or replace with a profile:
 
 ```powershell
-# Switch to work profile (smaller gaps, 2 monitors)
-Copy-Item ~/windots/themes/glazewm/profiles/work.yaml ~/.glzr/glazewm/config.yaml
-
-# Switch back to default
+# Switch profiles (e.g. after editing a copy in themes/glazewm/profiles/)
 Copy-Item ~/windots/themes/glazewm/profiles/default.yaml ~/.glzr/glazewm/config.yaml
 ```
 

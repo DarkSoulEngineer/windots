@@ -1,6 +1,7 @@
 general:
-  startup_commands: []
-  shutdown_commands: []
+  startup_commands:
+    - 'shell-exec yasb'
+  shutdown_commands: ['shell-exec taskkill /IM yasb.exe /F']
   config_reload_commands: []
 
   focus_follows_cursor: true
@@ -59,22 +60,22 @@ window_behavior:
       shown_on_top: false
 
 workspaces:
-  # Monitor 0 (leftmost) - 4 workspaces
+  # Main monitor - 4 workspaces (workspace numbering starts here at 1)
   - name: '1'
-    bind_to_monitor: 0
+    bind_to_monitor: 1
   - name: '2'
-    bind_to_monitor: 0
+    bind_to_monitor: 1
   - name: '3'
-    bind_to_monitor: 0
+    bind_to_monitor: 1
   - name: '4'
-    bind_to_monitor: 0
-  # Monitor 1 (middle) - 3 workspaces
+    bind_to_monitor: 1
+  # Secondary monitor - 3 workspaces (starts at 5)
   - name: '5'
-    bind_to_monitor: 1
+    bind_to_monitor: 0
   - name: '6'
-    bind_to_monitor: 1
+    bind_to_monitor: 0
   - name: '7'
-    bind_to_monitor: 1
+    bind_to_monitor: 0
   # Monitor 2 (right) - 3 workspaces
   - name: '8'
     bind_to_monitor: 2
@@ -86,6 +87,7 @@ workspaces:
 window_rules:
   - commands: ['ignore']
     match:
+      - window_process: {equals: 'yasb'}
       - window_title: {regex: '[Pp]icture.in.[Pp]icture'}
         window_class: {regex: 'Chrome_WidgetWin_1|MozillaDialogClass'}
       - window_process: {equals: 'PowerToys'}
@@ -173,9 +175,7 @@ keybindings:
   - commands: ['toggle-tiling-direction']
     bindings: ['alt+shift+t']
 
-  # Focus cycle / minimize
-  - commands: ['wm-cycle-focus']
-    bindings: ['alt+space']
+  # Minimize (alt+space is free: yasb Quick Launch search bar handles it)
   - commands: ['toggle-minimized']
     bindings: ['alt+m']
 
@@ -194,11 +194,11 @@ keybindings:
   #   bindings: ['alt+c']
   - commands: ['shell-exec wt']
     bindings: ['alt+c']
-  - commands: ['shell-exec brave']
+  - commands: ['shell-exec cmd /c start about:blank']
     bindings: ['alt+b']
   - commands: ['shell-exec explorer']
     bindings: ['alt+e']
-  - commands: ['shell-exec --hide-window __VSCODE_PATH__']
+  - commands: ['shell-exec --hide-window C:/Users/Admin/AppData/Local/Programs/Microsoft VS Code/bin/code.cmd']
     bindings: ['alt+v']
   - commands: ['shell-exec ms-settings:']
     bindings: ['alt+shift+s']
