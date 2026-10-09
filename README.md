@@ -4,7 +4,8 @@
 
 **A modern Windows desktop environment.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/github/license/DarkSoulEngineer/windots)](LICENSE)
+[![Language](https://img.shields.io/github/languages/top/DarkSoulEngineer/windots)](https://github.com/DarkSoulEngineer/windots)
 [![GlazeWM](https://img.shields.io/badge/GlazeWM-v3.9-0EB0C1?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJMMyA3djEwbDkgNSA5LTVIN0wxMiAyeiIgZmlsbD0iIzBFQjBCMUEiLz48L3N2Zz4=)](https://github.com/glzr-io/glazewm)
 [![yasb](https://img.shields.io/badge/yasb-v2.0.7-8B5CF6)](https://github.com/amnweb/yasb)
 
@@ -15,9 +16,19 @@ for a seamless Windows experience.
 
 </div>
 
----
+## Table of Contents
 
-## What is this?
+- [Description](#description)
+- [Screenshots](#screenshots)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Keybindings](#keybindings)
+- [Project Structure](#project-structure)
+- [Configuration](#configuration)
+- [Related Projects](#related-projects)
+- [License](#license)
+
+## Description
 
 windots bundles [GlazeWM](https://github.com/glzr-io/glazewm) (tiling WM) and
 [yasb](https://github.com/amnweb/yasb) (status bar) with ready-to-use configs,
@@ -30,8 +41,6 @@ themes, and a one-line installer.
 - **Multi-monitor support** with per-monitor workspace binding
 - **One-line installer** that sets up everything
 
----
-
 ## Screenshots
 
 | | |
@@ -41,9 +50,17 @@ themes, and a one-line installer.
 | ![Brave on workspace](assets/screenshots/brave-workspace.png) | |
 | *Brave browser on workspace 3* | |
 
----
+## Requirements
 
-## Quick Install
+- Windows (GlazeWM and yasb are Windows-only)
+- PowerShell, run as Administrator
+- [GlazeWM](https://github.com/glzr-io/glazewm) v3.9
+- [yasb](https://github.com/amnweb/yasb) v2.0.7
+
+The installer bootstraps the remaining prerequisites (Chocolatey, Git, and
+Brave) automatically.
+
+## Installation
 
 Open **PowerShell as Administrator** and run:
 
@@ -66,8 +83,6 @@ iex (iwr "https://raw.githubusercontent.com/DarkSoulEngineer/windots/main/instal
 
 > yasb watches `~/.config/yasb/config.yaml` and `~/.config/yasb/styles.css` for changes,
 > so styling is entirely config-driven. See [Configuration](#configuration) to make it your own.
-
----
 
 ## Keybindings
 
@@ -115,8 +130,6 @@ iex (iwr "https://raw.githubusercontent.com/DarkSoulEngineer/windots/main/instal
 | `alt+r` | Enter resize mode (h/j/k/l to resize, `alt+r` to exit) |
 | `alt+d` | Enter passthrough mode (`alt+d` to exit) |
 
----
-
 ## Project Structure
 
 ```
@@ -136,8 +149,6 @@ windots/
 └── LICENSE
 ```
 
----
-
 ## Configuration
 
 ### GlazeWM
@@ -155,16 +166,12 @@ The installer also registers yasb in GlazeWM's `startup_commands`, so the status
 
 Config is at `~/.config/yasb/config.yaml` (bars, widgets, and layout) and `~/.config/yasb/styles.css` (colors and styling). yasb watches both files, so edits apply live. The `:root` CSS variables (`--yasb-*`) in `styles.css` control the bar's colors — change them to restyle the whole bar.
 
----
-
 ## Related Projects
 
 | Project | Description |
 |---------|-------------|
 | [GlazeWM](https://github.com/glzr-io/glazewm) | Tiling window manager for Windows |
 | [yasb](https://github.com/amnweb/yasb) | Feature-rich, customizable status bar for Windows |
-
----
 
 ## License
 
