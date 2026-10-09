@@ -10,7 +10,7 @@
 [![yasb](https://img.shields.io/badge/yasb-v2.0.7-8B5CF6)](https://github.com/amnweb/yasb)
 
 Tiling window manager, customizable status bar, and a one-line installer
-for a seamless Windows experience.
+for Windows.
 
 ![Desktop preview](assets/screenshots/full-desktop-terminal.png)
 
@@ -164,7 +164,7 @@ The installer also registers yasb in GlazeWM's `startup_commands`, so the status
 
 ### yasb
 
-Config is at `~/.config/yasb/config.yaml` (bars, widgets, and layout) and `~/.config/yasb/styles.css` (colors and styling). yasb watches both files, so edits apply live. The `:root` CSS variables (`--yasb-*`) in `styles.css` control the bar's colors — change them to restyle the whole bar.
+Config is at `~/.config/yasb/config.yaml` (bars, widgets, and layout) and `~/.config/yasb/styles.css` (colors and styling). yasb watches both files, so edits apply live. The `:root` CSS variables (`--yasb-*`) in `styles.css` control the bar's colors. Change them to restyle the whole bar.
 
 ## Related Projects
 
